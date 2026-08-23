@@ -1,0 +1,46 @@
+{
+  "type": "FeatureCollection",
+  "name": "flood_extent",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "flood_id": "F01",
+        "severity": "HIGH",
+        "affected_sectors": ["S02", "S03", "S07"]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [1.2, 0.2],
+            [2.8, 0.2],
+            [2.8, 1.8],
+            [1.2, 1.8],
+            [1.2, 0.2]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "flood_id": "F02",
+        "severity": "MEDIUM",
+        "affected_sectors": ["S08", "S09", "S10"]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [2.7, 1.1],
+            [4.8, 1.1],
+            [4.8, 1.9],
+            [2.7, 1.9],
+            [2.7, 1.1]
+          ]
+        ]
+      }
+    }
+  ]
+}

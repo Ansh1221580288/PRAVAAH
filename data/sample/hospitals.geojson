@@ -1,0 +1,76 @@
+{
+  "type": "FeatureCollection",
+  "name": "hospitals",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "H01",
+        "name": "PRAVAAH General Hospital",
+        "sector_id": "S03",
+        "beds": 250,
+        "emergency": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.4, 0.4]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "H02",
+        "name": "North District Hospital",
+        "sector_id": "S02",
+        "beds": 180,
+        "emergency": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [1.3, 0.8]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "H03",
+        "name": "East Community Hospital",
+        "sector_id": "S07",
+        "beds": 150,
+        "emergency": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.1, 1.4]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "H04",
+        "name": "South Medical Centre",
+        "sector_id": "S09",
+        "beds": 120,
+        "emergency": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [3.4, 1.6]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "hospital_id": "H05",
+        "name": "Eastern Emergency Hospital",
+        "sector_id": "S10",
+        "beds": 200,
+        "emergency": true
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.4, 1.5]
+      }
+    }
+  ]
+}

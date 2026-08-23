@@ -1,0 +1,146 @@
+{
+  "type": "FeatureCollection",
+  "name": "roads",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R01",
+        "name": "North Main Road",
+        "road_type": "primary",
+        "asset_type": "road",
+        "sector_id": "S01"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[0.1,0.5],[4.9,0.5]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R02",
+        "name": "South Main Road",
+        "road_type": "primary",
+        "asset_type": "road",
+        "sector_id": "S06"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[0.1,1.5],[4.9,1.5]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R03",
+        "name": "Central East-West Road",
+        "road_type": "secondary",
+        "asset_type": "road",
+        "sector_id": "S03"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[2.1,0.2],[2.9,1.8]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R04",
+        "name": "Western Connector",
+        "road_type": "secondary",
+        "asset_type": "road",
+        "sector_id": "S02"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[0.5,0.1],[1.5,1.9]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R05",
+        "name": "River Bridge",
+        "road_type": "bridge",
+        "asset_type": "bridge",
+        "sector_id": "S03"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[2.5,0.4],[2.5,0.9]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R06",
+        "name": "East Bridge",
+        "road_type": "bridge",
+        "asset_type": "bridge",
+        "sector_id": "S07"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[1.5,1.4],[2.2,1.4]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R07",
+        "name": "Eastern Highway",
+        "road_type": "primary",
+        "asset_type": "road",
+        "sector_id": "S08"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[2.1,1.2],[4.8,1.8]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R08",
+        "name": "Southern Connector",
+        "road_type": "secondary",
+        "asset_type": "road",
+        "sector_id": "S09"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[3.1,1.1],[3.9,1.9]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R09",
+        "name": "Northern Connector",
+        "road_type": "secondary",
+        "asset_type": "road",
+        "sector_id": "S05"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[4.2,0.1],[4.2,1.8]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "road_id": "R10",
+        "name": "Community Road",
+        "road_type": "local",
+        "asset_type": "road",
+        "sector_id": "S10"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[4.1,1.2],[4.9,1.2]]
+      }
+    }
+  ]
+}

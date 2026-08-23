@@ -1,0 +1,126 @@
+{
+  "type": "FeatureCollection",
+  "name": "sectors",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "sector_id": "S01",
+        "population": 12000,
+        "vulnerable_population": 2400
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[0,0],[1,0],[1,1],[0,1],[0,0]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sector_id": "S02",
+        "population": 15000,
+        "vulnerable_population": 3000
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[1,0],[2,0],[2,1],[1,1],[1,0]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sector_id": "S03",
+        "population": 18000,
+        "vulnerable_population": 3600
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[2,0],[3,0],[3,1],[2,1],[2,0]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sector_id": "S04",
+        "population": 10000,
+        "vulnerable_population": 1800
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[3,0],[4,0],[4,1],[3,1],[3,0]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sector_id": "S05",
+        "population": 14000,
+        "vulnerable_population": 2800
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[4,0],[5,0],[5,1],[4,1],[4,0]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sector_id": "S06",
+        "population": 16000,
+        "vulnerable_population": 3200
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[0,1],[1,1],[1,2],[0,2],[0,1]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sector_id": "S07",
+        "population": 13000,
+        "vulnerable_population": 2600
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[1,1],[2,1],[2,2],[1,2],[1,1]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sector_id": "S08",
+        "population": 19000,
+        "vulnerable_population": 4200
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[2,1],[3,1],[3,2],[2,2],[2,1]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sector_id": "S09",
+        "population": 11000,
+        "vulnerable_population": 2200
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[3,1],[4,1],[4,2],[3,2],[3,1]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "sector_id": "S10",
+        "population": 17000,
+        "vulnerable_population": 3500
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[4,1],[5,1],[5,2],[4,2],[4,1]]]
+      }
+    }
+  ]
+}

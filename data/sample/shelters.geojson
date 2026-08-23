@@ -1,0 +1,76 @@
+{
+  "type": "FeatureCollection",
+  "name": "shelters",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "shelter_id": "SH01",
+        "name": "Central Relief Shelter",
+        "sector_id": "S03",
+        "capacity": 500,
+        "shelter_type": "emergency"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.5, 0.5]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "shelter_id": "SH02",
+        "name": "North Community Shelter",
+        "sector_id": "S02",
+        "capacity": 350,
+        "shelter_type": "community"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [1.2, 0.7]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "shelter_id": "SH03",
+        "name": "East Relief Shelter",
+        "sector_id": "S07",
+        "capacity": 400,
+        "shelter_type": "emergency"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.0, 1.5]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "shelter_id": "SH04",
+        "name": "South Community Shelter",
+        "sector_id": "S09",
+        "capacity": 300,
+        "shelter_type": "community"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [3.5, 1.5]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "shelter_id": "SH05",
+        "name": "Eastern Emergency Shelter",
+        "sector_id": "S10",
+        "capacity": 450,
+        "shelter_type": "emergency"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.5, 1.5]
+      }
+    }
+  ]
+}
