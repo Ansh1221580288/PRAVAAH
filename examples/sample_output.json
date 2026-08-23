@@ -1,0 +1,12 @@
+{
+  "sector_id": "S07",
+  "flood_probability": 0.75,
+  "flash_flood_probability": 0.78,
+  "landslide_probability": 0.59,
+  "risk_score": 0.73,
+  "risk_level": "HIGH",
+  "engine_version": "1.0.0",
+  "prediction_method": "Explainable Rule-Based Logic",
+  "execution_time_ms": 0.125,
+  "explanation": "Overall risk is classified as HIGH primarily driven by heavy rainfall of 220.0 mm, high river level of 8.1 m, saturated soil (75.0% moisture), and steep terrain slope of 18.0°."
+}
