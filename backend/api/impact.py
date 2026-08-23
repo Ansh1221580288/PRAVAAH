@@ -1,22 +1,44 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, HTTPException
+
+from geospatial.impact import calculate_sector_impact
 
 router = APIRouter()
 
 
 @router.get("/impact/current", tags=["Impact"])
 def get_current_impact(
-    sector_id: str = Query(..., description="Sector identifier")
+    sector_id: str = Query(
+        ...,
+        description="Sector identifier"
+    )
 ):
-    # Temporary demo data.
-    # Later this will come from Friend 3's GIS/impact engine.
-    return {
-        "sector_id": sector_id,
-        "population_exposed": 18400,
-        "vulnerable_population": 3200,
-        "roads_affected": 7,
-        "bridges_affected": 2,
-        "hospitals_affected": 1,
-        "schools_affected": 3,
-        "critical_infrastructure_affected": 2,
-        "priority": "CRITICAL"
-    }
+    """
+    Return impact intelligence calculated
+    from the prepared GIS data.
+    """
+
+    try:
+        result = calculate_sector_impact(sector_id)
+
+        if result is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Sector {sector_id} not found"
+            )
+
+        return result
+
+    except HTTPException:
+        raise
+
+    except FileNotFoundError as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"GIS data file missing: {exc}"
+        )
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Impact calculation failed: {exc}"
+        )

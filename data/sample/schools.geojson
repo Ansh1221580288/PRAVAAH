@@ -1,0 +1,84 @@
+{
+  "type": "FeatureCollection",
+  "name": "schools",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "school_id": "SCH01",
+        "name": "Central Public School",
+        "sector_id": "S03",
+        "students": 900
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.6, 0.6]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "school_id": "SCH02",
+        "name": "North Community School",
+        "sector_id": "S02",
+        "students": 700
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [1.4, 0.6]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "school_id": "SCH03",
+        "name": "Riverside High School",
+        "sector_id": "S03",
+        "students": 850
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.3, 0.8]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "school_id": "SCH04",
+        "name": "East District School",
+        "sector_id": "S07",
+        "students": 650
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.0, 1.6]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "school_id": "SCH05",
+        "name": "South Public School",
+        "sector_id": "S09",
+        "students": 750
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [3.4, 1.4]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "school_id": "SCH06",
+        "name": "Eastern Senior School",
+        "sector_id": "S10",
+        "students": 800
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.5, 1.6]
+      }
+    }
+  ]
+}
