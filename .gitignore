@@ -23,3 +23,8 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Local SQLite database
+*.db
+*.sqlite
+*.sqlite3
