@@ -7,32 +7,46 @@ export default function Header({
   apiStatus,
   currentUser,
   onOpenAuthModal,
-  onLogout
+  onLogout,
+  onOpenBroadcast
 }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/90 backdrop-blur-md">
-      <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-4 px-6 py-4">
+    <header className="sticky top-0 z-40 border-b-2 border-red-600 bg-gradient-to-r from-blue-950 via-slate-900 to-blue-950 shadow-2xl backdrop-blur-md">
+      <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-4 px-6 py-3">
 
         {/* Brand Logo & Name */}
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 shadow-lg shadow-cyan-500/20 text-2xl font-black text-white">
-            🌊
-          </div>
+          <img
+            src="/pravaah_logo.png"
+            alt="PRAVAAH - Navigate to Safety"
+            className="h-12 w-auto rounded-xl border-2 border-red-500/80 shadow-lg shadow-blue-500/30 object-contain bg-blue-950 p-1"
+          />
 
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-extrabold tracking-wider text-white">
+              <h1 className="text-xl font-black tracking-widest text-white drop-shadow-md">
                 PRAVAAH
               </h1>
-              <span className="rounded-full bg-cyan-950 px-2.5 py-0.5 text-[10px] font-bold text-cyan-400 border border-cyan-800/60">
-                PS 26192 • HIMALAYAN ENGINE
+              <span className="rounded-full bg-red-600 px-2.5 py-0.5 text-[10px] font-black text-white border border-red-400 uppercase tracking-wider shadow">
+                NAVIGATE TO SAFETY
               </span>
             </div>
-            <p className="text-xs text-slate-400">
-              Multi-Source Flash Flood & Disaster Intelligence Platform
+            <p className="text-xs text-blue-200 font-semibold">
+              Himalayan Multi-Hazard & Risk-Aware Evacuation Engine
             </p>
           </div>
         </div>
+
+        {/* Broadcast Alert Quick Access Button (Authority View) */}
+        {activeView === "authority" && (
+          <button
+            onClick={onOpenBroadcast}
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 px-4 py-2 text-xs font-black text-white shadow-lg shadow-rose-600/30 border border-rose-400 animate-pulse"
+          >
+            <span>📡</span>
+            <span>BROADCAST EMERGENCY ALERT</span>
+          </button>
+        )}
 
         {/* Center View Header - DEDICATED PER CONFIRMED USER ROLE (No mixing!) */}
         {currentUser ? (

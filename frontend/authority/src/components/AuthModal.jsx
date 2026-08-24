@@ -90,14 +90,12 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, defaultRole 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 p-4 backdrop-blur-md animate-fadeIn">
-      <div className={`relative w-full max-w-md rounded-3xl border ${
-        confirmedRole === "citizen" ? "border-emerald-800/80 bg-slate-900" : "border-cyan-800/80 bg-slate-900"
-      } p-6 sm:p-8 shadow-2xl space-y-6 transition-all`}>
+      <div className="relative w-full max-w-md rounded-3xl border-4 border-red-600 bg-white p-6 sm:p-8 shadow-2xl space-y-6 transition-all">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors text-lg"
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-900 transition-colors text-lg font-black"
         >
           ✕
         </button>
@@ -106,13 +104,18 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, defaultRole 
         {!confirmedRole ? (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <div className="inline-flex items-center gap-2 rounded-full bg-cyan-950 px-3.5 py-1 text-xs font-black text-cyan-400 border border-cyan-800">
+              <img
+                src="/pravaah_logo.png"
+                alt="PRAVAAH Logo"
+                className="h-14 w-auto mx-auto rounded-xl border-2 border-red-500 bg-blue-950 p-1 shadow"
+              />
+              <div className="inline-flex items-center gap-2 rounded-full bg-red-600 px-3.5 py-0.5 text-xs font-black text-white shadow">
                 <span>🛡️</span> PRAVAAH ACCESS GATEWAY
               </div>
-              <h2 className="text-2xl font-black text-white">
+              <h2 className="text-2xl font-black text-slate-900">
                 Confirm Your Identity
               </h2>
-              <p className="text-xs text-slate-300">
+              <p className="text-xs text-slate-500 font-semibold">
                 To access your dedicated portal, please select and confirm who you are:
               </p>
             </div>

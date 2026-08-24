@@ -52,19 +52,19 @@ export default function RiskMap({ sectors = [], regionFilter = "ALL", setRegionF
   });
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-xl">
-      {/* Map Header Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 px-6 py-4 bg-slate-950/60">
+    <div className="overflow-hidden rounded-2xl border-2 border-red-200 bg-white shadow-xl">
+      {/* Map Header Toolbar with Deep Blue Texture & Red Accents */}
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b-2 border-red-600 px-6 py-4 bg-gradient-to-r from-blue-950 via-slate-900 to-blue-950">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <h2 className="text-xl font-black text-white flex items-center gap-2">
               <span>🗺️</span> Real-Time Multi-Source Hazard Map
             </h2>
-            <span className="rounded-full bg-cyan-950 px-3 py-0.5 text-xs font-semibold text-cyan-400 border border-cyan-800/50">
+            <span className="rounded-full bg-red-600 px-3 py-0.5 text-xs font-black text-white border border-red-400">
               Indian Hilly Regions (HP, UK, Sikkim, Assam, Arunachal, Meghalaya)
             </span>
           </div>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-blue-200 font-semibold">
             Open-Meteo & GloFAS live telemetry • NASA LHASA landslide model • Multi-hazard breakdown
           </p>
         </div>
@@ -80,10 +80,10 @@ export default function RiskMap({ sectors = [], regionFilter = "ALL", setRegionF
             <button
               key={btn.id}
               onClick={() => setRegionFilter && setRegionFilter(btn.id)}
-              className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all ${
+              className={`rounded-xl px-4 py-1.5 text-xs font-black transition-all ${
                 regionFilter === btn.id
-                  ? "bg-cyan-500 text-slate-950 font-bold shadow-lg shadow-cyan-500/20 scale-105"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  ? "bg-red-600 text-white shadow-lg shadow-red-600/30 scale-105 border border-red-400"
+                  : "bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-700"
               }`}
             >
               {btn.label}

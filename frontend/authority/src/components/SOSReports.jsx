@@ -1,31 +1,31 @@
 export default function SOSReports({ reports }) {
   const getPriorityStyle = (priority) => {
     if (priority === "CRITICAL") {
-      return "bg-red-500/10 text-red-400 border-red-500/30";
+      return "bg-red-600 text-white border-red-400 font-black shadow";
     }
 
     if (priority === "HIGH") {
-      return "bg-orange-500/10 text-orange-400 border-orange-500/30";
+      return "bg-orange-600 text-white border-orange-400 font-bold";
     }
 
-    return "bg-yellow-500/10 text-yellow-400 border-yellow-500/30";
+    return "bg-amber-500 text-slate-950 border-amber-400 font-bold";
   };
 
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-      <div className="mb-4 flex items-center justify-between">
+    <section className="rounded-2xl border-2 border-red-200 bg-white p-5 shadow-xl">
+      <div className="mb-4 flex items-center justify-between border-b-2 border-red-100 pb-3">
         <div>
-          <h2 className="text-lg font-semibold text-white">
-            SOS Reports
+          <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
+            <span>🚨</span> Citizen Emergency SOS Reports
           </h2>
 
-          <p className="text-xs text-slate-400">
-            Active emergency reports
+          <p className="text-xs font-semibold text-slate-500">
+            Live two-way citizen dispatches sent directly to disaster control HQ
           </p>
         </div>
 
-        <span className="rounded-full bg-red-500/10 px-3 py-1 text-xs font-semibold text-red-400">
-          {reports.length} Active
+        <span className="rounded-full bg-red-600 px-3.5 py-1 text-xs font-black text-white shadow border border-red-400">
+          {reports.length} Active Dispatches
         </span>
       </div>
 
@@ -33,26 +33,26 @@ export default function SOSReports({ reports }) {
         {reports.map((report, index) => (
           <div
             key={index}
-            className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950 p-3"
+            className="flex items-center justify-between rounded-xl border border-red-200 bg-slate-50 p-3 hover:border-red-400 transition-all"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-500/10 text-lg">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-100 text-xl border border-red-200">
                 🚨
               </div>
 
               <div>
-                <p className="text-sm font-medium text-white">
+                <p className="text-sm font-bold text-slate-900">
                   Sector {report.location}
                 </p>
 
-                <p className="text-xs text-slate-500">
+                <p className="text-xs font-medium text-slate-500">
                   Reported {report.time}
                 </p>
               </div>
             </div>
 
             <span
-              className={`rounded-full border px-3 py-1 text-xs font-semibold ${getPriorityStyle(
+              className={`rounded-xl border px-3 py-1 text-xs uppercase ${getPriorityStyle(
                 report.priority
               )}`}
             >

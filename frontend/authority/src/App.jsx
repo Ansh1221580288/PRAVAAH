@@ -9,11 +9,14 @@ import ResourceAllocation from "./components/ResourceAllocation";
 import SituationMonitoring from "./components/SituationMonitoring";
 import ZoneInspector from "./components/ZoneInspector";
 import CitizenPortal from "./components/CitizenPortal";
+import CitizenFieldReports from "./components/CitizenFieldReports";
+import BroadcastConsoleModal from "./components/BroadcastConsoleModal";
 import AuthModal from "./components/AuthModal";
 import LogoutConfirmModal from "./components/LogoutConfirmModal";
 import { HILLY_SECTORS_GEO } from "./data/hillySectorsData";
 
 function App() {
+  const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const saved = localStorage.getItem("pravaah_user");
@@ -253,7 +256,7 @@ function App() {
     : "ALL HILLY REGIONS";
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white selection:bg-cyan-500 selection:text-slate-950 font-sans">
+    <div className="min-h-screen bg-slate-100 text-slate-900 selection:bg-red-600 selection:text-white font-sans">
       
       {/* App Header with View Switcher & Auth Controls */}
       <Header
@@ -263,6 +266,7 @@ function App() {
         currentUser={currentUser}
         onOpenAuthModal={handleOpenAuthModal}
         onLogout={() => setIsLogoutModalOpen(true)}
+        onOpenBroadcast={() => setIsBroadcastModalOpen(true)}
       />
 
       <main className="mx-auto max-w-[1600px] space-y-6 p-6">
@@ -271,29 +275,29 @@ function App() {
         {activeView === "authority" && (
           <>
             {/* Dashboard Title & Regional Status */}
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-900 pb-4">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b-2 border-red-200 bg-white p-6 rounded-2xl shadow-xl border-l-8 border-l-red-600">
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-cyan-400">
+                <p className="text-xs font-black uppercase tracking-widest text-red-600">
                   NATIONAL DISASTER OPERATIONS • HIMALAYAN ENGINE (PS 26192)
                 </p>
 
-                <h1 className="mt-1 text-3xl font-extrabold text-white">
+                <h1 className="mt-1 text-3xl font-black text-slate-900 tracking-tight">
                   Real-Time Situation & Multi-Hazard Intelligence
                 </h1>
 
-                <p className="mt-1 text-xs sm:text-sm text-slate-400">
+                <p className="mt-1 text-xs sm:text-sm text-slate-600 font-semibold">
                   Live satellite, hydrological gauge, and AI risk monitoring for Himachal Pradesh, Uttarakhand, Sikkim, & North-East Hills
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="rounded-lg bg-red-950/80 px-3 py-1.5 text-xs font-bold text-red-400 border border-red-800/60 shadow">
+                <span className="rounded-xl bg-red-600 px-4 py-2 text-xs font-black text-white shadow-lg shadow-red-600/30 border border-red-400 animate-pulse">
                   🔴 {liveCriticalCount} CRITICAL SECTORS ACTIVE ({activeZoneLabel})
                 </span>
                 {inspectSector && (
                   <button
                     onClick={() => setInspectSector(null)}
-                    className="rounded-lg bg-slate-800 hover:bg-slate-700 px-3 py-1.5 text-xs font-bold text-slate-300 transition-colors"
+                    className="rounded-xl bg-slate-900 hover:bg-slate-800 px-4 py-2 text-xs font-bold text-white transition-all shadow"
                   >
                     Clear Zone Filter ✕
                   </button>
@@ -368,6 +372,9 @@ function App() {
               <ResourceAllocation resources={resources} />
             </div>
 
+            {/* Two-Way Feedback Loop: Crowdsourced Citizen Field Incident Reports Console */}
+            <CitizenFieldReports sectorIdFilter={inspectSector?.sector_id} />
+
             {/* Live Situation Monitoring (Populated Physical Telemetry Gauges + Live Feed) */}
             <SituationMonitoring
               data={{
@@ -391,6 +398,15 @@ function App() {
         )}
 
       </main>
+
+      {/* Authority Emergency Broadcast Control Modal */}
+      <BroadcastConsoleModal
+        isOpen={isBroadcastModalOpen}
+        onClose={() => setIsBroadcastModalOpen(false)}
+        onBroadcastSent={() => {
+          fetchLiveData();
+        }}
+      />
 
       {/* Side Inspector Drawer (Opens when clicking any zone on the map or in Priority Sectors) */}
       {inspectSector && (

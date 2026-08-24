@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import EmergencyNavigation from "./EmergencyNavigation";
+import EmergencyBroadcastModal from "./EmergencyBroadcastModal";
 
 export default function CitizenPortal({
   sectors = [],
@@ -10,6 +12,10 @@ export default function CitizenPortal({
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [selectedSectorId, setSelectedSectorId] = useState("S02");
   
+  // Authority Broadcast Alert State
+  const [activeBroadcastAlert, setActiveBroadcastAlert] = useState(null);
+  const [dismissedBroadcastId, setDismissedBroadcastId] = useState(null);
+
   // Emergency SOS state
   const [sosCategory, setSosCategory] = useState("Flash Flood Evacuation Required");
   const [peopleCount, setPeopleCount] = useState(4);
@@ -23,33 +29,70 @@ export default function CitizenPortal({
   const [waterLevel, setWaterLevel] = useState("3.5");
   const [reportSubmitted, setReportSubmitted] = useState(false);
 
+  // Live polling for Authority Emergency Broadcast Alerts
+  useEffect(() => {
+    const checkBroadcast = async () => {
+      try {
+        const res = await fetch("http://127.0.0.1:8000/api/authority/broadcast");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.broadcast && data.broadcast.broadcast_id !== dismissedBroadcastId) {
+            setActiveBroadcastAlert(data.broadcast);
+          }
+        }
+      } catch (err) {
+        try {
+          const saved = localStorage.getItem("pravaah_active_broadcast");
+          if (saved) {
+            const b = JSON.parse(saved);
+            if (b.broadcast_id !== dismissedBroadcastId) {
+              setActiveBroadcastAlert(b);
+            }
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+    };
+
+    checkBroadcast();
+    const interval = setInterval(checkBroadcast, 4000);
+    return () => clearInterval(interval);
+  }, [dismissedBroadcastId]);
+
   // Translations Dictionary for Local Indian Hilly Languages
   const I18N = {
     hi: {
       portalTitle: "नागरिक आपदा सुरक्षा एवं प्रारंभिक चेतावनी पोर्टल",
       portalSub: "आपकी सुरक्षा हमारी सर्वोच्च प्राथमिकता है • वास्तविक समय सहायता एवं आश्रय खोजक",
-      langSelect: "भाषा चुनें (Select Local Language):",
-      warningHeader: "🚨 आपातकालीन प्रारंभिक चेतावनी (Emergency Early Warning Alert)",
+      langSelect: "भाषा चुनें:",
+      warningHeader: "🚨 आपातकालीन प्रारंभिक चेतावनी (Emergency Alert)",
       voiceButton: "🔊 सुनें आवाज चेतावनी (Play Voice Alert)",
       stopVoice: "⏹️ आवाज रोकें (Stop Voice Alert)",
-      sosHeader: "🚨 एक-क्लिक आपातकालीन SOS (One-Touch Emergency SOS Dispatch)",
+      sosHeader: "🚨 एक-क्लिक आपातकालीन SOS",
       sosDesc: "बटन दबाते ही राज्य एवं राष्ट्रीय आपदा मोचन बल (NDRF) को आपकी GPS स्थिति भेजी जाएगी।",
       peopleLabel: "फंसे हुए लोगों की संख्या:",
       medicalLabel: "चिकित्सा सहायता की आवश्यकता है",
-      sosButton: "🚨 आपातकालीन SOS भेजें (DISPATCH EMERGENCY SOS)",
-      shelterHeader: "🗺️ निकटतम सुरक्षित आश्रय एवं निकासी मार्ग (Safe Shelters)",
+      sosButton: "🚨 आपातकालीन SOS भेजें (DISPATCH SOS)",
+      shelterHeader: "🗺️ निकटतम सुरक्षित आश्रय एवं निकासी मार्ग",
       reportHeader: "📝 नागरिक क्षेत्र रिपोर्ट (Two-Way Crowd Incident Report)",
       reportDesc: "सड़क मार्ग अवरोध, नदी जलस्तर वृद्धि अथवा भूस्खलन की सूचना तुरंत प्रशासन को दें।",
       nameLabel: "आपका नाम:",
       hazardLabel: "आपदा का प्रकार:",
       descLabel: "विवरण / स्थल स्थिति:",
-      submitReport: "📤 रिपोर्ट जमा करें (Submit Field Report)"
+      submitReport: "📤 रिपोर्ट जमा करें (Submit Field Report)",
+      selectSectorLabel: "वर्तमान सेक्टर / स्थान चुनें:",
+      emergencyTypeLabel: "आपातकाल का प्रकार:",
+      shelterDesc: "सत्यापित NDRF और सरकारी राहत शिविर। भोजन, चिकित्सा और बिजली आपूर्ति उपलब्ध।",
+      capacityLabel: "क्षमता:",
+      callLabel: "संपर्क:",
+      suppliesLabel: "उपलब्ध सामग्री:"
     },
     pahari: {
       portalTitle: "नागरिक आपदा सुरक्षा ते चेतावनी पोर्टल",
       portalSub: "तुहाड़ी सुरक्षा साड़ी मुख्य प्राथमिकता • सुरक्षित ठार ते मदद",
       langSelect: "बोली चुनें:",
-      warningHeader: "🚨 आपातकालीन चेतावनी (Emergency Warning)",
+      warningHeader: "🚨 आपातकालीन चेतावनी",
       voiceButton: "🔊 अवाज़ सुणा (Play Voice Alert)",
       stopVoice: "⏹️ अवाज़ रोका",
       sosHeader: "🚨 एक-क्लिक आपातकालीन SOS",
@@ -63,13 +106,19 @@ export default function CitizenPortal({
       nameLabel: "तुहाड़ा नांह:",
       hazardLabel: "खतरे रा प्रकार:",
       descLabel: "हाल-चाल विवरण:",
-      submitReport: "📤 रिपोर्ट भेजो"
+      submitReport: "📤 रिपोर्ट भेजो",
+      selectSectorLabel: "स्थान चुनें:",
+      emergencyTypeLabel: "आपदा प्रकार:",
+      shelterDesc: "सत्यापित NDRF ते सरकारी राहत कैंप।",
+      capacityLabel: "क्षमता:",
+      callLabel: "फोन:",
+      suppliesLabel: "राहत सामान:"
     },
     as: {
       portalTitle: "নাগৰিক দুৰ্যোগ সুৰক্ষা আৰু আগতীয়া সতৰ্কবাণী প'ৰ্টেল",
       portalSub: "আপোনাৰ সুৰক্ষা আমাৰ প্ৰাথমিকতা • লাইভ জৰুৰীকালীন সাহায্য",
       langSelect: "ভাষা বাছনি কৰক:",
-      warningHeader: "🚨 জৰুৰীকালীন আগতীয়া সতৰ্কবাণী (Emergency Alert)",
+      warningHeader: "🚨 জৰুৰীকালীন আগতীয়া সতৰ্কবাণী",
       voiceButton: "🔊 বাৰ্তা শুনক (Play Voice Alert)",
       stopVoice: "⏹️ বন্ধ কৰক",
       sosHeader: "🚨 এক-স্পৰ্শ জৰুৰীকালীন SOS",
@@ -78,12 +127,18 @@ export default function CitizenPortal({
       medicalLabel: "চিকিৎসা সেৱাৰ প্ৰয়োজন",
       sosButton: "🚨 জৰুৰীকালীন SOS পঠিয়াওক",
       shelterHeader: "🗺️ নিকটৱৰ্তী সুৰক্ষিত আশ্ৰয় শিবিৰ",
-      reportHeader: "📝 নাগৰিক দুৰ্যোগ প্ৰতিবেদন (Crowd Report)",
+      reportHeader: "📝 নাগৰিক দুৰ্যোগ প্ৰতিবেদন",
       reportDesc: "পথ অৱৰোধ বা নদীৰ পানী বৃদ্ধিৰ তথ্য প্ৰশাসনক জনাওক।",
       nameLabel: "আপোনাৰ নাম:",
       hazardLabel: "দুৰ্যোগৰ প্ৰকাৰ:",
       descLabel: "বৰ্ণনা:",
-      submitReport: "📤 প্ৰতিবেদন জমা দিয়ক"
+      submitReport: "📤 প্ৰতিবেদন জমা দিয়ক",
+      selectSectorLabel: "বৰ্তমান ছেক্টৰ / স্থান বাছনি কৰক:",
+      emergencyTypeLabel: "জৰুৰীকালীন অৱস্থাৰ প্ৰকাৰ:",
+      shelterDesc: "প্ৰমাণিত NDRF আৰু চৰকাৰী সাহায্য শিবিৰ। আহাৰ, চিকিৎসা সেৱা উপলব্ধ।",
+      capacityLabel: "ক্ষমতা:",
+      callLabel: "যোগাযোগ:",
+      suppliesLabel: "উপলব্ধ সামগ্ৰী:"
     },
     garhwali: {
       portalTitle: "नागरिक आपदा सुरक्षा एवं चेतावनी पोर्टल",
@@ -103,7 +158,13 @@ export default function CitizenPortal({
       nameLabel: "तुमरो नौं:",
       hazardLabel: "खतरा को प्रकार:",
       descLabel: "विवरण:",
-      submitReport: "📤 रिपोर्ट भेजा"
+      submitReport: "📤 रिपोर्ट भेजा",
+      selectSectorLabel: "स्थान चुना:",
+      emergencyTypeLabel: "खतरा को प्रकार:",
+      shelterDesc: "सरकारी राहत कैंप। डाक्टर अर खाणा की व्यवस्था छ।",
+      capacityLabel: "क्षमता:",
+      callLabel: "फोन करा:",
+      suppliesLabel: "सामान:"
     },
     ne: {
       portalTitle: "नागरिक विपद् सुरक्षा तथा प्रारम्भिक चेतावनी पोर्टल",
@@ -123,13 +184,19 @@ export default function CitizenPortal({
       nameLabel: "तपाईंको नाम:",
       hazardLabel: "विपद्को प्रकार:",
       descLabel: "विवरण:",
-      submitReport: "📤 रिपोर्ट पठाउनुहोस्"
+      submitReport: "📤 रिपोर्ट पठाउनुहोस्",
+      selectSectorLabel: "वर्तमान सेक्टर / स्थान छान्नुहोस्:",
+      emergencyTypeLabel: "आपत्कालको प्रकार:",
+      shelterDesc: "प्रमाणित NDRF र सरकारी राहत शिविरहरू। खाना र स्वास्थ्य सेवा उपलब्ध।",
+      capacityLabel: "क्षमता:",
+      callLabel: "सम्पर्क:",
+      suppliesLabel: "उपलब्ध सामग्री:"
     },
     bn: {
       portalTitle: "নাগরিক দুর্যোগ সুরক্ষা ও প্রারম্ভিক সতর্কবার্তা পোর্টাল",
       portalSub: "আপনার সুরক্ষা আমাদের অগ্রাধিকার • লাইভ সাহায্য ও আশ্রয় কেন্দ্র",
       langSelect: "ভাষা নির্বাচন করুন:",
-      warningHeader: "🚨 জরুরি সতর্কবার্তা (Emergency Alert)",
+      warningHeader: "🚨 জরুরি সতর্কবার্তা",
       voiceButton: "🔊 বার্তা শুনুন (Play Voice Alert)",
       stopVoice: "⏹️ থামান",
       sosHeader: "🚨 এক-ক্লিক জরুরি SOS",
@@ -143,7 +210,13 @@ export default function CitizenPortal({
       nameLabel: "আপনার নাম:",
       hazardLabel: "দুর্যোগের ধরন:",
       descLabel: "বিবরণ:",
-      submitReport: "📤 রিপোর্ট জমা দিন"
+      submitReport: "📤 রিপোর্ট জমা দিন",
+      selectSectorLabel: "বর্তমান সেক্টর / স্থান নির্বাচন করুন:",
+      emergencyTypeLabel: "জরুরি পরিস্থিতির ধরন:",
+      shelterDesc: "যাচাইকৃত এনডিআরএফ এবং সরকারি ত্রাণ শিবির। খাদ্য ও চিকিৎসা সেবা প্রস্তুত।",
+      capacityLabel: "ক্ষমতা:",
+      callLabel: "যোগাযোগ:",
+      suppliesLabel: "উপলব্ধ সামগ্রী:"
     },
     en: {
       portalTitle: "Citizen Disaster Safety & Early Warning Portal",
@@ -163,7 +236,13 @@ export default function CitizenPortal({
       nameLabel: "Your Full Name:",
       hazardLabel: "Hazard Type:",
       descLabel: "Field Observations / Details:",
-      submitReport: "📤 Submit Field Report"
+      submitReport: "📤 Submit Field Report",
+      selectSectorLabel: "Select Current Sector / Location:",
+      emergencyTypeLabel: "Emergency Type:",
+      shelterDesc: "Verified NDRF & Government Relief Camps with real-time food, medical, and power supply status.",
+      capacityLabel: "Capacity:",
+      callLabel: "Call:",
+      suppliesLabel: "Available Supplies:"
     }
   };
 
@@ -179,15 +258,25 @@ export default function CitizenPortal({
 
   const currentSector = sectorList.find(s => s.sector_id === selectedSectorId) || sectorList[0];
 
+const UNIVERSAL_DISASTER_VOICE_ALERT = {
+  hi: "आपातकालीन चेतावनी! ध्यान दें। क्षेत्र में फ्लैश फ्लड और भूस्खलन का गंभीर खतरा है। कृपया तुरंत सुरक्षित उच्च स्थान या निकटतम राहत केंद्र पर पहुंचें। नदी किनारे से दूर रहें।",
+  as: "জৰুৰীকালীন সতৰ্কবাণী! মনোযোগ দিয়ক। অঞ্চলটোত আকস্মিক বান আৰু ভূমিস্খলনৰ অতি ভয়ানক বিপদ আছে। অনুগ্ৰহ কৰি লগে লগে সুৰক্ষিত উচ্চ স্থান বা নিকটৱৰ্তী আশ্ৰয় শিবিৰলৈ যাওক।",
+  bn: "জরুরি সতর্কবার্তা! মনোযোগ দিন। এলাকায় আকস্মিক বন্যা এবং ভূমিধসের মারাত্মক ঝুঁকি রয়েছে। দয়া করে অবিলম্বে নিরাপদ উঁচু স্থানে বা নিকটস্থ আশ্রয় কেন্দ্রে যান।",
+  pahari: "आपत्कालीन चेतावनी! ध्यान दया। इलाके च भारी बाढ़ ते भूस्खलन रा बड्डा खतरा है। दया करी हूण सुरक्षित उच्छी ठां ते नेड़े रे राहत कैंप च पुज्जा।",
+  garhwali: "आपातकालीन चेतावनी! ध्यान द्या। क्षेत्र मा फ्लैश फ्लड अर भूस्खलन को भारी खतरा छ। कृपा करी तुरंत सुरक्षित डांड या नजीकै का राहत कैंप मा पाँछा।",
+  ne: "आपत्कालीन चेतावनी! ध्यान दिनुहोस्। क्षेत्रमा आकस्मिक बाढी र पहिरोको गम्भीर जोखिम छ। कृपया तुरुन्तै सुरक्षित अग्लो ठाउँ वा नजिकैको राहत शिविरमा जानुहोस्।",
+  en: "Emergency Early Warning Alert! Attention. High risk of flash floods and landslides detected in this sector. Proceed immediately to the nearest safe shelter or higher ground."
+};
+
   // Multilingual Speech Synthesis for Local Languages
   const playAudioAlert = () => {
     if ("speechSynthesis" in window) {
       window.speechSynthesis.cancel();
 
-      // Extract warning text matching selected language
+      // Extract warning text matching selected language with guaranteed fallback
       const warningText = currentSector.languages?.[language] ||
-        currentSector.languages?.hi ||
-        `${currentSector.name}. Emergency flash flood alert active. Seek higher ground immediately.`;
+        UNIVERSAL_DISASTER_VOICE_ALERT[language] ||
+        UNIVERSAL_DISASTER_VOICE_ALERT.hi;
 
       const utterance = new SpeechSynthesisUtterance(warningText);
       utterance.rate = 0.9;
@@ -209,7 +298,9 @@ export default function CitizenPortal({
 
       // Match native voices if available
       const voices = window.speechSynthesis.getVoices();
-      const matchingVoice = voices.find(v => v.lang.toLowerCase().includes(targetLang.toLowerCase().slice(0, 2)));
+      const langPrefix = targetLang.slice(0, 2).toLowerCase();
+      const matchingVoice = voices.find(v => v.lang.toLowerCase().startsWith(langPrefix)) ||
+        voices.find(v => v.lang.toLowerCase().includes("in"));
       if (matchingVoice) {
         utterance.voice = matchingVoice;
       }
@@ -295,31 +386,38 @@ export default function CitizenPortal({
   return (
     <div className="space-y-6">
 
-      {/* Top Banner & Language Selector */}
-      <div className="rounded-2xl border border-cyan-800/60 bg-gradient-to-r from-slate-900 via-cyan-950/60 to-slate-900 p-6 shadow-2xl">
+      {/* Top Banner & Language Selector with Deep Blue Texture & Red Accents */}
+      <div className="rounded-2xl border-2 border-red-200 bg-gradient-to-r from-blue-950 via-slate-900 to-blue-950 p-6 shadow-2xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <span className="rounded-full bg-cyan-900/80 px-3 py-1 text-xs font-bold text-cyan-300 border border-cyan-700">
-              CITIZEN SAFETY APP • PRAVAAH
-            </span>
-            <h1 className="mt-2 text-2xl sm:text-3xl font-extrabold text-white">
-              {t.portalTitle}
-            </h1>
-            <p className="mt-1 text-xs sm:text-sm text-cyan-200/80">
-              {t.portalSub}
-            </p>
+          <div className="flex items-center gap-3">
+            <img
+              src="/pravaah_logo.png"
+              alt="PRAVAAH Logo"
+              className="h-12 w-auto rounded-xl border border-red-400 bg-blue-950 p-1 shadow"
+            />
+            <div>
+              <span className="rounded-full bg-red-600 px-3 py-0.5 text-[10px] font-black text-white border border-red-400 uppercase tracking-wider">
+                CITIZEN SAFETY APP • PRAVAAH
+              </span>
+              <h1 className="mt-1 text-2xl sm:text-3xl font-black text-white">
+                {t.portalTitle}
+              </h1>
+              <p className="mt-0.5 text-xs sm:text-sm text-blue-200 font-semibold">
+                {t.portalSub}
+              </p>
+            </div>
           </div>
 
           {/* Language Selector Dropdown */}
-          <div className="flex items-center gap-2 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
-            <span className="text-xs text-slate-300 font-semibold hidden sm:inline">{t.langSelect}</span>
+          <div className="flex items-center gap-2 bg-slate-900/90 p-2.5 rounded-xl border border-slate-700 shadow">
+            <span className="text-xs text-blue-200 font-extrabold hidden sm:inline">{t.langSelect}</span>
             <select
               value={language}
               onChange={(e) => {
                 setLanguage(e.target.value);
                 if (isPlayingAudio) stopAudioAlert();
               }}
-              className="rounded-lg bg-slate-900 border border-slate-700 px-3 py-1.5 text-xs font-bold text-cyan-400 focus:outline-none focus:border-cyan-500"
+              className="rounded-lg bg-blue-950 border border-red-500/60 px-3 py-1.5 text-xs font-black text-white focus:outline-none focus:border-red-400"
             >
               <option value="pahari">पहाड़ी / Himachali (HP)</option>
               <option value="hi">हिंदी (Hindi)</option>
@@ -333,15 +431,18 @@ export default function CitizenPortal({
         </div>
       </div>
 
+      {/* CORE USP: RISK-AWARE EMERGENCY NAVIGATION ENGINE */}
+      <EmergencyNavigation sectors={sectors} language={language} />
+
       {/* Multilingual Voice Early Warning Card */}
-      <div className="rounded-2xl border border-rose-900/60 bg-rose-950/30 p-6 shadow-xl space-y-4">
+      <div className="rounded-2xl border-2 border-red-300 bg-white p-6 shadow-xl space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
-            <h2 className="text-lg font-bold text-rose-300 flex items-center gap-2">
+            <h2 className="text-lg font-black text-red-600 flex items-center gap-2">
               {t.warningHeader}
             </h2>
-            <p className="text-sm font-medium text-white">
-              Sector Zone: <strong className="text-cyan-400">{currentSector.name}</strong> ({currentSector.state})
+            <p className="text-sm font-bold text-slate-800">
+              Sector Zone: <strong className="text-blue-900 font-black">{currentSector.name}</strong> ({currentSector.state})
             </p>
           </div>
 
@@ -350,14 +451,14 @@ export default function CitizenPortal({
             {!isPlayingAudio ? (
               <button
                 onClick={playAudioAlert}
-                className="flex items-center gap-2 rounded-xl bg-rose-600 hover:bg-rose-500 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-rose-600/30 transition-all"
+                className="flex items-center gap-2 rounded-xl bg-red-600 hover:bg-red-500 px-5 py-2.5 text-xs font-black text-white shadow-lg shadow-red-600/30 transition-all border border-red-400"
               >
                 {t.voiceButton}
               </button>
             ) : (
               <button
                 onClick={stopAudioAlert}
-                className="flex items-center gap-2 rounded-xl bg-slate-800 hover:bg-slate-700 px-4 py-2.5 text-xs font-bold text-rose-400 border border-rose-800 transition-all"
+                className="flex items-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 px-5 py-2.5 text-xs font-black text-white border border-slate-700 transition-all"
               >
                 {t.stopVoice}
               </button>
@@ -366,12 +467,12 @@ export default function CitizenPortal({
         </div>
 
         {/* Dynamic Multilingual Warning Box */}
-        <div className="rounded-xl border border-rose-800/40 bg-slate-950/80 p-4">
-          <p className="text-xs font-semibold text-rose-400 uppercase tracking-wider mb-1">
+        <div className="rounded-xl border border-red-200 bg-red-50/80 p-4">
+          <p className="text-xs font-extrabold text-red-600 uppercase tracking-wider mb-1">
             Localized Warning Speech Text ({language.toUpperCase()}):
           </p>
-          <p className="text-sm sm:text-base font-bold text-white leading-relaxed">
-            "{currentSector.languages?.[language] || currentSector.languages?.hi || "WARNING: Flash flood and landslide threat active. Seek higher ground immediately."}"
+          <p className="text-sm sm:text-base font-bold text-slate-900 leading-relaxed">
+            "{currentSector.languages?.[language] || UNIVERSAL_DISASTER_VOICE_ALERT[language] || UNIVERSAL_DISASTER_VOICE_ALERT.hi}"
           </p>
         </div>
       </div>
@@ -380,29 +481,29 @@ export default function CitizenPortal({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
         {/* 1. One-Touch Emergency SOS Dispatcher */}
-        <div className="rounded-2xl border border-red-900/60 bg-slate-900 p-6 space-y-4 shadow-xl">
+        <div className="rounded-2xl border-2 border-red-200 bg-white p-6 space-y-4 shadow-xl">
           <div>
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <h2 className="text-lg font-black text-red-600 flex items-center gap-2">
               {t.sosHeader}
             </h2>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs font-semibold text-slate-500 mt-1">
               {t.sosDesc}
             </p>
           </div>
 
           {sosSent && (
-            <div className="rounded-xl border border-emerald-800 bg-emerald-950/90 p-4 text-xs text-emerald-300 font-bold flex items-center gap-2">
+            <div className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-xs text-emerald-800 font-bold flex items-center gap-2 shadow">
               <span>✅</span> EMERGENCY SOS BROADCASTED TO DISASTER CONTROL HQ! RESCUE TEAM DISPATCHED.
             </div>
           )}
 
           <div className="space-y-4">
             <div>
-              <label className="text-xs font-semibold text-slate-300">Select Current Sector / Location:</label>
+              <label className="text-xs font-bold text-slate-700">{t.selectSectorLabel}</label>
               <select
                 value={selectedSectorId}
                 onChange={(e) => setSelectedSectorId(e.target.value)}
-                className="mt-1 w-full rounded-xl bg-slate-950 border border-slate-800 p-3 text-xs text-white focus:outline-none focus:border-cyan-500 font-semibold"
+                className="mt-1 w-full rounded-xl bg-slate-50 border border-slate-300 p-3 text-xs text-slate-900 focus:outline-none focus:border-red-500 font-bold"
               >
                 {sectorList.map((s) => (
                   <option key={s.sector_id} value={s.sector_id}>
@@ -413,11 +514,11 @@ export default function CitizenPortal({
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-slate-300">Emergency Type:</label>
+              <label className="text-xs font-bold text-slate-700">{t.emergencyTypeLabel}</label>
               <select
                 value={sosCategory}
                 onChange={(e) => setSosCategory(e.target.value)}
-                className="mt-1 w-full rounded-xl bg-slate-950 border border-slate-800 p-3 text-xs text-white focus:outline-none focus:border-cyan-500"
+                className="mt-1 w-full rounded-xl bg-slate-50 border border-slate-300 p-3 text-xs text-slate-900 focus:outline-none focus:border-red-500 font-semibold"
               >
                 <option value="Flash Flood Evacuation Required">🌊 Flash Flood Evacuation Required</option>
                 <option value="Landslide Trap & Road Blockage">⛰️ Landslide Trap & Road Blockage</option>
@@ -428,14 +529,14 @@ export default function CitizenPortal({
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-semibold text-slate-300">{t.peopleLabel}</label>
+                <label className="text-xs font-bold text-slate-700">{t.peopleLabel}</label>
                 <input
                   type="number"
                   min="1"
                   max="50"
                   value={peopleCount}
                   onChange={(e) => setPeopleCount(e.target.value)}
-                  className="mt-1 w-full rounded-xl bg-slate-950 border border-slate-800 p-3 text-xs text-white font-bold"
+                  className="mt-1 w-full rounded-xl bg-slate-50 border border-slate-300 p-3 text-xs text-slate-900 font-bold"
                 />
               </div>
 
@@ -445,9 +546,9 @@ export default function CitizenPortal({
                   id="medical"
                   checked={needsMedical}
                   onChange={(e) => setNeedsMedical(e.target.checked)}
-                  className="h-4 w-4 rounded accent-red-600"
+                  className="h-4 w-4 rounded accent-red-600 cursor-pointer"
                 />
-                <label htmlFor="medical" className="text-xs text-slate-300 font-semibold cursor-pointer">
+                <label htmlFor="medical" className="text-xs text-slate-800 font-bold cursor-pointer">
                   {t.medicalLabel}
                 </label>
               </div>
@@ -455,7 +556,7 @@ export default function CitizenPortal({
 
             <button
               onClick={handleSendSOS}
-              className="w-full rounded-xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 p-4 text-sm font-extrabold text-white shadow-xl shadow-red-600/30 transition-all flex items-center justify-center gap-2"
+              className="w-full rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 p-4 text-sm font-black text-white shadow-xl shadow-red-600/30 transition-all flex items-center justify-center gap-2 border border-red-400"
             >
               {t.sosButton}
             </button>
@@ -463,13 +564,13 @@ export default function CitizenPortal({
         </div>
 
         {/* 2. Safe Evacuation Route & Relief Shelters */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 space-y-4 shadow-xl">
+        <div className="rounded-2xl border-2 border-red-200 bg-white p-6 space-y-4 shadow-xl">
           <div>
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <h2 className="text-lg font-black text-blue-900 flex items-center gap-2">
               {t.shelterHeader}
             </h2>
-            <p className="text-xs text-slate-400 mt-1">
-              Verified NDRF & Government Relief Camps with real-time food, medical, and power supply status.
+            <p className="text-xs font-semibold text-slate-500 mt-1">
+              {t.shelterDesc}
             </p>
           </div>
 
@@ -492,19 +593,19 @@ export default function CitizenPortal({
                 contact: "+91-1372-252100"
               }
             ].map((sh, idx) => (
-              <div key={idx} className="rounded-xl border border-slate-800 bg-slate-950 p-4 space-y-2">
+              <div key={idx} className="rounded-xl border border-blue-200 bg-blue-50/40 p-4 space-y-2">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-cyan-400">{sh.name}</h3>
-                  <span className="rounded bg-emerald-950 px-2 py-0.5 text-[11px] font-bold text-emerald-400 border border-emerald-800">
+                  <h3 className="text-sm font-bold text-blue-900">{sh.name}</h3>
+                  <span className="rounded-lg bg-emerald-600 px-2.5 py-0.5 text-[11px] font-black text-white shadow">
                     {sh.distance}
                   </span>
                 </div>
-                <div className="flex items-center justify-between text-xs text-slate-400">
-                  <span>Capacity: {sh.capacity} ({sh.occupancy})</span>
-                  <span>Call: <strong className="text-white">{sh.contact}</strong></span>
+                <div className="flex items-center justify-between text-xs text-slate-600 font-semibold">
+                  <span>{t.capacityLabel} {sh.capacity} ({sh.occupancy})</span>
+                  <span>{t.callLabel} <strong className="text-slate-900">{sh.contact}</strong></span>
                 </div>
-                <p className="text-xs text-slate-300">
-                  <strong>Available Supplies:</strong> {sh.supplies}
+                <p className="text-xs text-slate-700 font-medium">
+                  <strong>{t.suppliesLabel}</strong> {sh.supplies}
                 </p>
               </div>
             ))}
@@ -514,41 +615,41 @@ export default function CitizenPortal({
       </div>
 
       {/* 3. Two-Way Crowd Incident Report Form */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 space-y-4 shadow-xl">
+      <div className="rounded-2xl border-2 border-red-200 bg-white p-6 space-y-4 shadow-xl">
         <div>
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+          <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
             {t.reportHeader}
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs font-semibold text-slate-500 mt-1">
             {t.reportDesc}
           </p>
         </div>
 
         {reportSubmitted && (
-          <div className="rounded-xl border border-cyan-800 bg-cyan-950/90 p-4 text-xs text-cyan-300 font-bold">
+          <div className="rounded-xl border border-blue-300 bg-blue-50 p-4 text-xs text-blue-900 font-bold shadow">
             ✅ FIELD REPORT REGISTERED! THANK YOU FOR UPDATING NATIONAL DISASTER INTELLIGENCE.
           </div>
         )}
 
         <form onSubmit={handleSendReport} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label className="text-xs font-semibold text-slate-300">{t.nameLabel}</label>
+            <label className="text-xs font-bold text-slate-700">{t.nameLabel}</label>
             <input
               type="text"
               placeholder="e.g. Ramesh Thakur"
               value={reporterName}
               onChange={(e) => setReporterName(e.target.value)}
-              className="mt-1 w-full rounded-xl bg-slate-950 border border-slate-800 p-3 text-xs text-white"
+              className="mt-1 w-full rounded-xl bg-slate-50 border border-slate-300 p-3 text-xs text-slate-900 font-medium"
               required
             />
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-slate-300">{t.hazardLabel}</label>
+            <label className="text-xs font-bold text-slate-700">{t.hazardLabel}</label>
             <select
               value={hazardType}
               onChange={(e) => setHazardType(e.target.value)}
-              className="mt-1 w-full rounded-xl bg-slate-950 border border-slate-800 p-3 text-xs text-white"
+              className="mt-1 w-full rounded-xl bg-slate-50 border border-slate-300 p-3 text-xs text-slate-900 font-medium"
             >
               <option value="Landslide Road Blockage">⛰️ Landslide Road Blockage</option>
               <option value="River Water Level Spurt">🌊 River Water Level Spurt</option>
@@ -558,13 +659,13 @@ export default function CitizenPortal({
           </div>
 
           <div className="sm:col-span-2">
-            <label className="text-xs font-semibold text-slate-300">{t.descLabel}</label>
+            <label className="text-xs font-bold text-slate-700">{t.descLabel}</label>
             <textarea
               rows="3"
               placeholder="Describe exact road location, boulder slides, or water overflow..."
               value={reportDescription}
               onChange={(e) => setReportDescription(e.target.value)}
-              className="mt-1 w-full rounded-xl bg-slate-950 border border-slate-800 p-3 text-xs text-white"
+              className="mt-1 w-full rounded-xl bg-slate-50 border border-slate-300 p-3 text-xs text-slate-900 font-medium"
               required
             />
           </div>
@@ -572,13 +673,25 @@ export default function CitizenPortal({
           <div className="sm:col-span-2">
             <button
               type="submit"
-              className="w-full rounded-xl bg-cyan-600 hover:bg-cyan-500 p-3.5 text-xs font-bold text-white shadow-lg shadow-cyan-600/20 transition-all"
+              className="w-full rounded-xl bg-blue-900 hover:bg-blue-800 p-3.5 text-xs font-black text-white shadow-lg shadow-blue-900/30 transition-all border border-blue-700"
             >
               {t.submitReport}
             </button>
           </div>
         </form>
       </div>
+
+      {/* Authority Emergency Broadcast Pop-up Modal (Voice-Locked) */}
+      <EmergencyBroadcastModal
+        broadcast={activeBroadcastAlert}
+        language={language}
+        onClose={() => {
+          if (activeBroadcastAlert?.broadcast_id) {
+            setDismissedBroadcastId(activeBroadcastAlert.broadcast_id);
+          }
+          setActiveBroadcastAlert(null);
+        }}
+      />
 
     </div>
   );

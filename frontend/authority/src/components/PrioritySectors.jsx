@@ -15,17 +15,17 @@ export default function PrioritySectors({ sectors = [], onSelectSector }) {
   };
 
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+    <section className="rounded-2xl border-2 border-red-200 bg-white p-6 shadow-xl">
+      <div className="flex items-center justify-between border-b-2 border-red-100 pb-4 mb-4">
         <div>
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+          <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
             <span>⚠️</span> Priority Emergency Sectors (Multi-Hazard Focus)
           </h2>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs font-semibold text-slate-500">
             Real-time monitoring of Flash Floods 🌊, River Surge 🌧️, and Landslides ⛰️ across Himalayan sectors
           </p>
         </div>
-        <span className="rounded-full bg-red-950/80 px-3 py-1 text-xs font-bold text-red-400 border border-red-800/60">
+        <span className="rounded-full bg-red-600 px-3.5 py-1 text-xs font-black text-white shadow border border-red-400 uppercase">
           {sectors.length} ACTIVE ZONES
         </span>
       </div>

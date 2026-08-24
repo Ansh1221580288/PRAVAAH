@@ -34,7 +34,29 @@ class CrowdReportCreate(BaseModel):
     description: str = Field(default="Field hazard report.", min_length=3, description="Hazard description")
 
 
-# In-memory storage for Two-Way Feedback Loop
+class BroadcastCreate(BaseModel):
+    sector_id: str = Field(default="ALL", description="Target sector or ALL")
+    title: str = Field(default="EMERGENCY DISASTER BROADCAST", description="Broadcast title")
+    message: str = Field(default="Flash flood warning active. Move to high ground immediately.", description="Emergency message text")
+    severity: str = Field(default="CRITICAL", description="CRITICAL, HIGH, or WARNING")
+
+
+class ReportAction(BaseModel):
+    status: str = Field(default="VERIFIED & DISPATCHED", description="Verification status")
+    official_notes: Optional[str] = Field(default="Actioned by Authority Command HQ", description="Official notes")
+
+
+# In-memory storage for Two-Way Feedback Loop & Broadcast Alerts
+CURRENT_EMERGENCY_BROADCAST: Optional[Dict[str, Any]] = {
+    "broadcast_id": "BCAST-501",
+    "sector_id": "ALL",
+    "title": "🚨 HIGH RIDGE FLASH FLOOD EVACUATION ALERT",
+    "message": "Beas & Alaknanda rivers have breached emergency 4.5m surge level. Citizens in lower highway corridors must immediately move to nearest High Ridge Relief Shelter!",
+    "severity": "CRITICAL",
+    "timestamp": datetime.now(timezone.utc).isoformat(),
+    "sender": "State Disaster Operation Center (SDOC)"
+}
+
 ACTIVE_SOS_REPORTS: List[Dict[str, Any]] = [
     {
         "id": "SOS-101",
@@ -90,6 +112,8 @@ CROWD_FIELD_REPORTS: List[Dict[str, Any]] = [
         "water_level_m": 4.8,
         "description": "Boulders sliding from upper mountain slope onto highway lane.",
         "verified": True,
+        "status": "VERIFIED & DISPATCHED",
+        "official_notes": "NDRF Team #4 dispatched to clear highway boulder breach.",
         "timestamp": datetime.now(timezone.utc).isoformat()
     },
     {
@@ -100,7 +124,9 @@ CROWD_FIELD_REPORTS: List[Dict[str, Any]] = [
         "location": "Guwahati Khanapara Hill Creek",
         "water_level_m": 1.9,
         "description": "Flash rain overflowed drainage canal into low-lying housing colony.",
-        "verified": True,
+        "verified": False,
+        "status": "UNVERIFIED",
+        "official_notes": "Awaiting municipal field verification.",
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
 ]
@@ -197,6 +223,75 @@ def get_safe_shelters(
     }
 
 
+@router.get("/citizen/reports", tags=["Citizen"])
+def get_crowd_reports(
+    sector_id: Optional[str] = Query(default=None, description="Optional sector ID filter")
+):
+    """
+    Returns crowdsourced citizen field reports for Authority Command Console verification.
+    """
+    reports = CROWD_FIELD_REPORTS
+    if sector_id:
+        reports = [r for r in CROWD_FIELD_REPORTS if r.get("sector_id") == sector_id]
+    return {
+        "status": "success",
+        "total_reports": len(reports),
+        "reports": reports
+    }
+
+
+@router.put("/citizen/reports/{report_id}/action", tags=["Authority"])
+def action_crowd_report(report_id: str, payload: ReportAction):
+    """
+    Allows Authority Officials to verify and action citizen field reports.
+    """
+    for r in CROWD_FIELD_REPORTS:
+        if r["id"] == report_id:
+            r["verified"] = True
+            r["status"] = payload.status
+            r["official_notes"] = payload.official_notes
+            return {
+                "status": "success",
+                "message": f"Report {report_id} actioned successfully.",
+                "report": r
+            }
+    raise HTTPException(status_code=404, detail="Report ID not found")
+
+
+@router.get("/authority/broadcast", tags=["Authority"])
+def get_emergency_broadcast():
+    """
+    Returns current active authority emergency broadcast alert.
+    """
+    return {
+        "status": "success",
+        "broadcast": CURRENT_EMERGENCY_BROADCAST
+    }
+
+
+@router.post("/authority/broadcast", tags=["Authority"])
+def create_emergency_broadcast(payload: BroadcastCreate):
+    """
+    Broadcasts a critical emergency text alert from Authority Command Center to all citizens.
+    """
+    global CURRENT_EMERGENCY_BROADCAST
+    new_broadcast = {
+        "broadcast_id": f"BCAST-{int(datetime.now(timezone.utc).timestamp())}",
+        "sector_id": payload.sector_id,
+        "title": payload.title,
+        "message": payload.message,
+        "severity": payload.severity,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "sender": "State Disaster Operations Center (SDOC)"
+    }
+    CURRENT_EMERGENCY_BROADCAST = new_broadcast
+    return {
+        "status": "success",
+        "message": "Emergency Alert broadcasted live to all citizen portals.",
+        "broadcast": new_broadcast
+    }
+
+
 @router.post("/citizen/report", tags=["Citizen"])
 def submit_crowd_report(payload: CrowdReportCreate):
     """
@@ -211,11 +306,86 @@ def submit_crowd_report(payload: CrowdReportCreate):
         "water_level_m": payload.water_level_m,
         "description": payload.description,
         "verified": False,
+        "status": "UNVERIFIED",
+        "official_notes": "Awaiting authority verification.",
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
     CROWD_FIELD_REPORTS.insert(0, new_report)
     return {
         "status": "success",
         "message": "Field report registered in Two-Way Feedback Loop.",
-        "report_id": new_report["id"]
+        "report_id": new_report["id"],
+        "report": new_report
+    }
+
+
+@router.get("/citizen/safe-routes", tags=["Citizen"])
+def get_safe_routes(
+    scenario: str = Query(default="CRITICAL_FLOOD", description="Emergency scenario: NORMAL, HEAVY_RAINFALL, CRITICAL_FLOOD")
+):
+    """
+    Returns AI-scored emergency evacuation routes prioritizing SAFETY OVER SPEED.
+    Evaluates flood risk, landslide risk, road blockage, water level, and slope.
+    """
+    is_flood = scenario == "CRITICAL_FLOOD"
+    is_heavy_rain = scenario == "HEAVY_RAINFALL"
+
+    return {
+        "status": "success",
+        "disaster_scenario": f"SIMULATED EMERGENCY ({scenario})",
+        "principle": "SAFETY OVER SPEED (Safety > Distance/ETA)",
+        "origin": {
+            "latitude": 30.1200,
+            "longitude": 78.3000,
+            "location_name": "Sector S07 Garhwal Base"
+        },
+        "destination": {
+            "name": "Relief Camp Alpha (NDRF High Ground Base)",
+            "latitude": 30.1850,
+            "longitude": 78.3600,
+            "capacity": "800 People (210 Occupied)",
+            "status": "SAFE & OPERATIONAL"
+        },
+        "recommended_route": {
+            "route_id": "r3",
+            "name": "Route C — High Elevation Ridge Bypass",
+            "tag": "SAFEST ROUTE",
+            "distance_km": 7.9 if is_flood else 8.4,
+            "eta_minutes": 28,
+            "safety_score": 94 if is_flood else (96 if is_heavy_rain else 98),
+            "flood_risk": "VERY LOW",
+            "landslide_risk": "LOW",
+            "road_blockage_risk": "LOW",
+            "water_level_risk": "LOW",
+            "terrain_slope_risk": "LOW (Elevated Ridge)",
+            "reason": "Route C is recommended because it has the lowest overall disaster risk (94/100), completely avoiding the high-risk flood corridor and landslide-prone lower highway, although it takes approximately 16 minutes longer than Route A."
+        },
+        "alternatives": [
+            {
+                "route_id": "r2",
+                "name": "Route B — Mid-Ridge Secondary Road",
+                "tag": "BALANCED",
+                "distance_km": 5.8,
+                "eta_minutes": 19 if is_flood else 18,
+                "safety_score": 76 if is_flood else (84 if is_heavy_rain else 92),
+                "flood_risk": "LOW-MODERATE",
+                "landslide_risk": "MEDIUM",
+                "road_blockage_risk": "LOW",
+                "status": "ACCEPTABLE",
+                "reason": "Bypasses primary flood river basin, but experiences minor surface water runoff and 14° mountain grade."
+            },
+            {
+                "route_id": "r1",
+                "name": "Route A — Lower Valley Highway (Fastest)",
+                "tag": "FASTEST",
+                "distance_km": 4.1,
+                "eta_minutes": 12 if is_flood else 10,
+                "safety_score": 42 if is_flood else (58 if is_heavy_rain else 92),
+                "flood_risk": "HIGH" if is_flood else "MODERATE",
+                "landslide_risk": "MEDIUM",
+                "road_blockage_risk": "HIGH" if is_flood else "LOW",
+                "status": "NOT RECOMMENDED" if is_flood else ("HIGH RISK" if is_heavy_rain else "FASTEST"),
+                "warning": "Shortest route passes through a high-risk flood zone (3.8m water) and 2 blocked highway collapses."
+            }
+        ]
     }
