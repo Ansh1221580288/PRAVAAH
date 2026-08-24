@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "buildCommand": "cd frontend/authority && npm install && npm run build",
+  "outputDirectory": "frontend/authority/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
