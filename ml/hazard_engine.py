@@ -104,10 +104,10 @@ def predict_hazard(data: Dict[str, Any]) -> Dict[str, Any]:
         
         logger.debug(f"Input model successfully created for sector {input_model.sector_id}")
 
-        # Execute predictions
-        flood_prob = round(predict_flood(input_model), 2)
-        flash_prob = round(predict_flash_flood(input_model), 2)
-        landslide_prob = round(predict_landslide(input_model), 2)
+        # Execute predictions with 0.1% ground-zero precision
+        flood_prob = round(predict_flood(input_model), 3)
+        flash_prob = round(predict_flash_flood(input_model), 3)
+        landslide_prob = round(predict_landslide(input_model), 3)
 
         # Calculate risk score and level
         risk_score, risk_level = calculate_risk(flood_prob, flash_prob, landslide_prob)

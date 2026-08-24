@@ -23,7 +23,7 @@ def calculate_risk(flood_prob: float, flash_flood_prob: float, landslide_prob: f
         + RISK_WEIGHTS["flash_flood"] * ff
         + RISK_WEIGHTS["landslide"] * l_
     )
-    score = round(raw_score, 2)
+    score = round(raw_score, 3)
 
     # Classify the risk level based on exclusive/inclusive ranges
     if score <= LOW_THRESHOLD:

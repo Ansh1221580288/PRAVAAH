@@ -1,56 +1,68 @@
-from fastapi import APIRouter, Query
-from datetime import datetime, timezone
+"""
+PRAVAAH Multi-Hazard Intelligence API Router
+Exposes live-sectors weather telemetry and AI hazard predictions for Indian Hilly Regions.
+"""
 
+from datetime import datetime, timezone
+from typing import Dict, Any, List
+# pyrefly: ignore [missing-import]
+from fastapi import APIRouter, Query
+
+from backend.services.weather_service import get_all_hilly_sectors_telemetry, HILLY_SECTORS, fetch_open_meteo_telemetry
 from ml.hazard_engine import predict_hazard
 
 
 router = APIRouter()
 
 
-SECTOR_TELEMETRY = {
-    "S07": {
-        "rainfall": 220.0,
-        "river_level": 8.1,
-        "soil_moisture": 75.0,
-        "slope": 18.0,
-        "elevation": 110.0,
-        "historical_risk": 0.65
-    },
-
-    "S17": {
-        "rainfall": 120.0,
-        "river_level": 4.5,
-        "soil_moisture": 55.0,
-        "slope": 12.0,
-        "elevation": 150.0,
-        "historical_risk": 0.30
+@router.get("/hazard/live-sectors", tags=["Hazard"])
+def get_live_hilly_sectors() -> Dict[str, Any]:
+    """
+    Returns real-time weather telemetry and AI hazard predictions
+    for all Indian Hilly sectors across Western & Eastern Himalayas and North-East India.
+    """
+    sectors_data = get_all_hilly_sectors_telemetry()
+    return {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "total_sectors": len(sectors_data),
+        "region_coverage": "Western Himalayas, Garhwal/Kumaon, Sikkim, & North-East Hilly States (Assam, Arunachal, Meghalaya)",
+        "sectors": sectors_data
     }
-}
 
 
 @router.get("/hazard/current", tags=["Hazard"])
 def get_current_hazard(
     sector_id: str = Query(
-        ...,
-        description="Sector identifier"
+        default="S01",
+        description="Sector identifier (e.g., S01 to S10)"
     )
-):
-
-    if sector_id not in SECTOR_TELEMETRY:
+) -> Dict[str, Any]:
+    """
+    Returns live weather telemetry, open-meteo readings, and ML hazard prediction for a specific sector.
+    """
+    if sector_id not in HILLY_SECTORS:
         return {
             "error": "Sector telemetry not found",
             "sector_id": sector_id
         }
 
-    telemetry = {
+    sector_info = HILLY_SECTORS[sector_id]
+    # pyrefly: ignore [bad-argument-type]
+    telemetry_live = fetch_open_meteo_telemetry(sector_info["latitude"], sector_info["longitude"])
+
+    telemetry_input = {
         "sector_id": sector_id,
-        **SECTOR_TELEMETRY[sector_id]
+        "rainfall": telemetry_live["rainfall_rate_mmh"] * 2.8,
+        "river_level": telemetry_live["river_level"],
+        "soil_moisture": telemetry_live["soil_moisture"],
+        "slope": sector_info["slope"],
+        "elevation": sector_info["elevation"],
+        "historical_risk": sector_info["historical_risk"]
     }
 
-    prediction = predict_hazard(telemetry)
-
-    prediction["timestamp"] = datetime.now(
-        timezone.utc
-    ).isoformat()
+    prediction = predict_hazard(telemetry_input)
+    prediction["timestamp"] = datetime.now(timezone.utc).isoformat()
+    prediction["telemetry_live"] = telemetry_live
+    prediction["sector_metadata"] = sector_info
 
     return prediction

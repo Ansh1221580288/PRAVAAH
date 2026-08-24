@@ -106,7 +106,7 @@ class TestHazardEngine(unittest.TestCase):
             "river_level": 0.0,
             "soil_moisture": 0.0,
             "slope": 0.0,
-            "elevation": 1000.0,
+            "elevation": 4000.0,
             "historical_risk": 0.0
         }
         res = predict_hazard(data)

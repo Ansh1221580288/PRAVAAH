@@ -1,0 +1,14 @@
+[pyrefly]
+ignore = ["**/_pyrefly_virtual_/**"]
+search_paths = [
+  ".",
+  ".venv/Lib/site-packages"
+]
+
+[tool.pyrefly]
+ignore = ["**/_pyrefly_virtual_/**"]
+search_paths = [
+  ".",
+  ".venv/Lib/site-packages"
+]
+

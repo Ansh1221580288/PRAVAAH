@@ -10,3 +10,26 @@ body,
 body {
   font-family: Inter, system-ui, sans-serif;
 }
+
+/* Custom Leaflet Tooltip & Pointer Events Fixes */
+.custom-leaflet-tooltip {
+  pointer-events: none !important;
+  background-color: rgba(2, 6, 23, 0.92) !important;
+  border: 1px solid rgba(30, 41, 59, 0.9) !important;
+  border-radius: 10px !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6) !important;
+  padding: 6px 10px !important;
+}
+
+.custom-leaflet-tooltip::before {
+  border-top-color: rgba(2, 6, 23, 0.92) !important;
+}
+
+.leaflet-container {
+  font-family: inherit !important;
+}
+
+.cursor-pointer {
+  cursor: pointer !important;
+}

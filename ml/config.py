@@ -10,7 +10,7 @@ MAX_RAINFALL: float = 300.0  # in mm
 MAX_RIVER_LEVEL: float = 10.0  # in meters
 MAX_SOIL_MOISTURE: float = 100.0  # in percentage
 MAX_SLOPE: float = 45.0  # in degrees
-MAX_ELEVATION: float = 1000.0  # in meters
+MAX_ELEVATION: float = 4000.0  # in meters
 MAX_HISTORICAL_RISK: float = 1.0  # normalized [0, 1]
 
 # Predictor weights for individual hazard estimation
